@@ -15,6 +15,8 @@
 
 #include <BLE_API.h>
 #include <Servo.h>
+#include <ST7032.h>
+ST7032 lcd;
 
 #define TXRX_BUF_LEN                      20
 
@@ -40,6 +42,7 @@ Servo                                    myservo;
 
 static boolean analog_enabled = false;
 static byte old_state         = LOW;
+static boolean lcd_enabled    = false;
 
 // The uuid of service and characteristics
 static const uint8_t service1_uuid[]        = {0x71, 0x3D, 0, 0, 0x50, 0x3E, 0x4C, 0x75, 0xBA, 0x94, 0x31, 0x48, 0xF1, 0x8D, 0x94, 0x1E};
@@ -70,10 +73,16 @@ void gattServerWriteCallBack(const GattWriteCallbackParams *Handler) {
     //Process the data
     if (buf[0] == 0x01) {
       // Command is to control digital out pin
-      if (buf[1] == 0x01)
+      if (buf[1] == 0x01) {
         digitalWrite(DIGITAL_OUT_PIN, HIGH);
-      else
+        lcd.begin(8,2);
+        lcd.setContrast(35);
+        lcd.print("BLE Nano");
+        lcd_enabled = true;
+      } else {
         digitalWrite(DIGITAL_OUT_PIN, LOW);
+        lcd_enabled = false;
+      }
     }
     else if (buf[0] == 0xA0) {
       // Command is to enable analog in reading
@@ -111,6 +120,18 @@ void m_status_check_handle() {
     buf[1] = (value >> 8);
     buf[2] = (value);
     ble.updateCharacteristicValue(characteristic2.getValueAttribute().getHandle(), buf, 3);
+
+    if (lcd_enabled) {
+      lcd.setCursor(0,1);
+      lcd.print("        "); // over write 8 digits
+      lcd.setCursor(0,1);
+      lcd.print(value);
+    }
+  } else {
+    if (lcd_enabled) {
+      lcd.setCursor(0,1);
+      lcd.print("No value "); // fill 8 digits
+    }
   }
   // If digital in changes, report the state
   if (digitalRead(DIGITAL_IN_PIN) != old_state) {
@@ -162,7 +183,7 @@ void setup() {
   pinMode(PWM_PIN, OUTPUT);
 
   // Default to internally pull high, change it if you need
-  digitalWrite(DIGITAL_IN_PIN, HIGH);
+  digitalWrite(DIGITAL_IN_PIN, LOW);
 
   myservo.attach(SERVO_PIN);
   myservo.write(0);
