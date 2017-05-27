@@ -27,8 +27,8 @@
 #endif
 
 #ifdef BLE_NANO
-#define DIGITAL_OUT_PIN                   D2
-#define DIGITAL_IN_PIN                    D3
+#define DIGITAL_OUT_PIN                   D0
+#define DIGITAL_IN_PIN                    D1
 #define PWM_PIN                           D4
 #define SERVO_PIN                         D5
 #define ANALOG_IN_PIN                     A3
