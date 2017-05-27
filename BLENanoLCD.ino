@@ -139,7 +139,7 @@ void setup() {
   // setup adv_data and srp_data
   ble.accumulateAdvertisingPayload(GapAdvertisingData::BREDR_NOT_SUPPORTED);
   ble.accumulateAdvertisingPayload(GapAdvertisingData::SHORTENED_LOCAL_NAME,
-                                   (const uint8_t *)"TXRX", sizeof("TXRX") - 1);
+                                   (const uint8_t *)"BLELCD", sizeof("BLELCD") - 1);
   ble.accumulateAdvertisingPayload(GapAdvertisingData::COMPLETE_LIST_128BIT_SERVICE_IDS,
                                    (const uint8_t *)uart_base_uuid_rev, sizeof(uart_base_uuid_rev));
   // set adv_type
